@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="mb-4">Diabetes Prediction Form</h2>
+
+{% if prediction %}
+    <div class="alert alert-success fw-bold">{{ prediction }}</div>
+{% endif %}
+
+<form method="POST">
+    {% for field in ['Pregnancies','Glucose','BloodPressure','SkinThickness','Insulin','BMI','DiabetesPedigreeFunction','Age'] %}
+        <div class="mb-3">
+            <label class="form-label">{{ field }}</label>
+            <input type="number" step="any" name="{{ field }}" class="form-control"
+                   value="{{ data.get(field, '') }}" required>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success">Predict</button>
+</form>
+{% endblock %}

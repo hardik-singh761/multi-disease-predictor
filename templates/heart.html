@@ -1,0 +1,105 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="mb-4">Heart Disease Prediction</h2>
+
+{% if prediction %}
+    <div class="alert alert-success fw-bold">{{ prediction }}</div>
+{% endif %}
+
+<form method="POST">
+    <div class="mb-3">
+        <label>Age</label>
+        <input type="number" name="age" class="form-control" value="{{ data.get('age', '') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Sex</label>
+        <select class="form-select" name="sex" required>
+            {% for option in sex_options %}
+            <option value="{{ option }}" {% if data.get('sex') == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Chest Pain Type</label>
+        <select class="form-select" name="cp" required>
+            {% for option in cp_options %}
+            <option value="{{ option }}" {% if data.get('cp') == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Resting Blood Pressure</label>
+        <input type="number" name="trestbps" class="form-control" value="{{ data.get('trestbps', '') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Cholesterol</label>
+        <input type="number" name="chol" class="form-control" value="{{ data.get('chol', '') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Fasting Blood Sugar</label>
+        <select class="form-select" name="fbs" required>
+            {% for option in fbs_options %}
+            <option value="{{ option }}" {% if data.get('fbs') == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Resting ECG</label>
+        <select class="form-select" name="restecg" required>
+            {% for option in restecg_options %}
+            <option value="{{ option }}" {% if data.get('restecg') == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Maximum Heart Rate Achieved</label>
+        <input type="number" name="thalach" class="form-control" value="{{ data.get('thalach', '') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Exercise Induced Angina</label>
+        <select class="form-select" name="exang" required>
+            {% for option in exang_options %}
+            <option value="{{ option }}" {% if data.get('exang') == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Oldpeak</label>
+        <input type="number" step="any" name="oldpeak" class="form-control" value="{{ data.get('oldpeak', '') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Slope</label>
+        <select class="form-select" name="slope" required>
+            {% for option in slope_options %}
+            <option value="{{ option }}" {% if data.get('slope') == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Number of Major Vessels (ca)</label>
+        <input type="number" name="ca" class="form-control" value="{{ data.get('ca', '') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Thalassemia</label>
+        <select class="form-select" name="thal" required>
+            {% for option in thal_options %}
+            <option value="{{ option }}" {% if data.get('thal') == option %}selected{% endif %}>{{ option }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Predict</button>
+</form>
+{% endblock %}
