@@ -8,6 +8,7 @@ app = Flask(__name__)
 diabetes_model = pickle.load(open('diabetes_model.sav', 'rb'))
 heart_model = pickle.load(open('heart_disease_model.sav', 'rb'))
 parkinsons_model = pickle.load(open('parkinsons_model.sav', 'rb'))
+alzheimers_model = pickle.load(open('alzheimers_model.sav', 'rb'))
 
 @app.route('/')
 def home():
@@ -17,13 +18,21 @@ def home():
 def diabetes():
     prediction = None
     input_data = {}
+    error = None
     if request.method == 'POST':
-        fields = ['Pregnancies','Glucose','BloodPressure','SkinThickness','Insulin','BMI','DiabetesPedigreeFunction','Age']
-        input_data = {field: request.form.get(field) for field in fields}
-        values = np.asarray([float(input_data[f]) for f in fields]).reshape(1, -1)
-        result = diabetes_model.predict(values)[0]
-        prediction = "Diabetic" if result == 1 else "Not Diabetic"
-    return render_template('diabetes.html', prediction=prediction, data=input_data)
+        try:
+            fields = ['Pregnancies','Glucose','BloodPressure','SkinThickness','Insulin','BMI','DiabetesPedigreeFunction','Age']
+            input_data = {field: request.form.get(field) for field in fields}
+            if not all(input_data.values()):
+                error = "⚠️ Please fill out all fields."
+            else:
+                values = np.asarray([float(input_data[f]) for f in fields]).reshape(1, -1)
+                result = diabetes_model.predict(values)[0]
+                prediction = "Diabetic" if result == 1 else "Not Diabetic"
+        except ValueError:
+            error = "⚠️ Invalid input. Please enter numeric values only."
+    return render_template('diabetes.html', prediction=prediction, data=input_data, error=error)
+
 
 @app.route('/heart', methods=['GET', 'POST'])
 def heart():
@@ -94,6 +103,66 @@ def parkinsons():
         result = parkinsons_model.predict(values)[0]
         prediction = "Parkinson’s Detected" if result == 1 else "No Parkinson’s"
     return render_template('parkinsons.html', prediction=prediction, data=input_data)
+
+@app.route('/alzheimers', methods=['GET', 'POST'])
+def alzheimers():
+    prediction = None
+    input_data = {}
+
+    # Categorical value mappings
+    categorical_mappings = {
+        "Gender": {"Male": 0, "Female": 1},
+        "Ethnicity": {"White": 0, "Black": 1, "Asian": 2, "Hispanic": 3, "Other": 4},
+        "EducationLevel": {"No Schooling": 0, "Primary": 1, "Secondary": 2, "Tertiary": 3},
+        "Smoking": {"Yes": 1, "No": 0},
+        "AlcoholConsumption": {"Yes": 1, "No": 0},
+        "PhysicalActivity": {"Low": 0, "Moderate": 1, "High": 2},
+        "DietQuality": {"Poor": 0, "Average": 1, "Good": 2},
+        "SleepQuality": {"Poor": 0, "Average": 1, "Good": 2},
+        "FamilyHistoryAlzheimers": {"Yes": 1, "No": 0},
+        "CardiovascularDisease": {"Yes": 1, "No": 0},
+        "Diabetes": {"Yes": 1, "No": 0},
+        "Depression": {"Yes": 1, "No": 0},
+        "HeadInjury": {"Yes": 1, "No": 0},
+        "Hypertension": {"Yes": 1, "No": 0},
+        "MemoryComplaints": {"Yes": 1, "No": 0},
+        "BehavioralProblems": {"Yes": 1, "No": 0},
+        "Confusion": {"Yes": 1, "No": 0},
+        "Disorientation": {"Yes": 1, "No": 0},
+        "PersonalityChanges": {"Yes": 1, "No": 0},
+        "DifficultyCompletingTasks": {"Yes": 1, "No": 0},
+        "Forgetfulness": {"Yes": 1, "No": 0}
+    }
+
+    if request.method == 'POST':
+        fields = ['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption',
+                  'PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryAlzheimers',
+                  'CardiovascularDisease','Diabetes','Depression','HeadInjury','Hypertension',
+                  'SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+                  'CholesterolTriglycerides','MMSE','FunctionalAssessment','MemoryComplaints',
+                  'BehavioralProblems','ADL','Confusion','Disorientation','PersonalityChanges',
+                  'DifficultyCompletingTasks','Forgetfulness']  
+        
+        raw_data = {field: request.form.get(field) for field in fields}
+        input_data = {}
+
+        try:
+            for field in fields:
+                value = raw_data[field]
+                if field in categorical_mappings:
+                    input_data[field] = categorical_mappings[field].get(value, 0)
+                else:
+                    input_data[field] = float(value)
+
+            values = np.asarray([input_data[f] for f in fields]).reshape(1, -1)
+            result = alzheimers_model.predict(values)[0]
+            prediction = "Alzheimer’s Detected" if result == 1 else "No Alzheimer’s"
+
+        except Exception as e:
+            prediction = f"Error: {str(e)}"
+
+    return render_template('alzheimers.html', prediction=prediction, data=input_data)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
