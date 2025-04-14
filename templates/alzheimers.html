@@ -1,0 +1,66 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="mb-4">Alzheimer’s Prediction Form</h2>
+
+{% if prediction %}
+<div class="card text-white bg-primary mb-4 shadow">
+    <div class="card-body text-center">
+        <h4 class="card-title">Prediction Result</h4>
+        <p class="card-text fs-4 fw-bold">{{ prediction }}</p>
+    </div>
+</div>
+{% endif %}
+{% set categorical_fields = {
+    'Gender': ['Male', 'Female'],
+    'Ethnicity': ['White', 'Black', 'Asian', 'Hispanic', 'Other'],
+    'EducationLevel': ['No Schooling', 'Primary', 'Secondary', 'Tertiary'],
+    'Smoking': ['Yes', 'No'],
+    'AlcoholConsumption': ['Yes', 'No'],
+    'PhysicalActivity': ['Low', 'Moderate', 'High'],
+    'DietQuality': ['Poor', 'Average', 'Good'],
+    'SleepQuality': ['Poor', 'Average', 'Good'],
+    'FamilyHistoryAlzheimers': ['Yes', 'No'],
+    'CardiovascularDisease': ['Yes', 'No'],
+    'Diabetes': ['Yes', 'No'],
+    'Depression': ['Yes', 'No'],
+    'HeadInjury': ['Yes', 'No'],
+    'Hypertension': ['Yes', 'No'],
+    'MemoryComplaints': ['Yes', 'No'],
+    'BehavioralProblems': ['Yes', 'No'],
+    'Confusion': ['Yes', 'No'],
+    'Disorientation': ['Yes', 'No'],
+    'PersonalityChanges': ['Yes', 'No'],
+    'DifficultyCompletingTasks': ['Yes', 'No'],
+    'Forgetfulness': ['Yes', 'No']
+} %}
+
+
+<form method="POST">
+    {% for field in ['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption',
+    'PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryAlzheimers',
+    'CardiovascularDisease','Diabetes','Depression','HeadInjury','Hypertension',
+    'SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+    'CholesterolTriglycerides','MMSE','FunctionalAssessment','MemoryComplaints',
+    'BehavioralProblems','ADL','Confusion','Disorientation','PersonalityChanges',
+    'DifficultyCompletingTasks','Forgetfulness'] %}
+    
+    <div class="mb-3">
+        <label class="form-label">{{ field }}</label>
+
+        {% if field in categorical_fields %}
+            <select class="form-select" name="{{ field }}" required>
+                {% for option in categorical_fields[field] %}
+                    <option value="{{ option }}" {% if data.get(field) == option %}selected{% endif %}>{{ option }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <input type="number" step="any" name="{{ field }}" class="form-control" value="{{ data.get(field, '') }}" required>
+        {% endif %}
+    </div>
+    
+    {% endfor %}
+    
+    <button type="submit" class="btn btn-success">Predict</button>
+</form>
+
+{% endblock %}
